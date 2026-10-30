@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"slices"
 
-	"github.com/kaz/pprotein/internal/collect"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
+	"github.com/ymhiroki/pprotein-v2026/internal/collect"
 )
 
 type (

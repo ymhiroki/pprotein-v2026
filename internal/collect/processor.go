@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/kaz/pprotein/internal/storage"
+	"github.com/ymhiroki/pprotein-v2026/internal/storage"
 )
 
 const cacheTypeKey = "cache"

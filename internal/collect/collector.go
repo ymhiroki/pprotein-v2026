@@ -7,8 +7,8 @@ import (
 	"sync"
 
 	"github.com/goccy/go-json"
-	"github.com/kaz/pprotein/internal/event"
-	"github.com/kaz/pprotein/internal/storage"
+	"github.com/ymhiroki/pprotein-v2026/internal/event"
+	"github.com/ymhiroki/pprotein-v2026/internal/storage"
 )
 
 type (

@@ -9,8 +9,8 @@ import (
 	"github.com/felixge/fgprof"
 	"github.com/goccy/go-json"
 	"github.com/gorilla/mux"
-	"github.com/kaz/pprotein/internal/git"
-	"github.com/kaz/pprotein/internal/tail"
+	"github.com/ymhiroki/pprotein-v2026/internal/git"
+	"github.com/ymhiroki/pprotein-v2026/internal/tail"
 )
 
 var (

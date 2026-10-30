@@ -1,10 +1,10 @@
 package echov4
 
 import (
-	"github.com/kaz/pprotein/integration"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/ymhiroki/pprotein-v2026/integration"
 )
 
 func Integrate(e *echo.Echo) {

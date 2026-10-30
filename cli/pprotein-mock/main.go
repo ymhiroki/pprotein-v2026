@@ -11,8 +11,8 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/kaz/pprotein/integration/echov4"
 	"github.com/labstack/echo/v4"
+	"github.com/ymhiroki/pprotein-v2026/integration/echov4"
 )
 
 var (

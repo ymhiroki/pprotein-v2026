@@ -6,7 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/kaz/pprotein/internal/collect"
+	"github.com/ymhiroki/pprotein-v2026/internal/collect"
 )
 
 type (

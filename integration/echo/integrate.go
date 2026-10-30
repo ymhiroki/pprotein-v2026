@@ -1,10 +1,10 @@
 package echo
 
 import (
-	"github.com/kaz/pprotein/integration"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/ymhiroki/pprotein-v2026/integration"
 )
 
 func Integrate(e *echo.Echo) {

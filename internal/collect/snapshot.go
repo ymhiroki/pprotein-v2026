@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
-	"github.com/kaz/pprotein/internal/git"
-	"github.com/kaz/pprotein/internal/storage"
+	"github.com/ymhiroki/pprotein-v2026/internal/git"
+	"github.com/ymhiroki/pprotein-v2026/internal/storage"
 )
 
 type (

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/kaz/pprotein/internal/storage"
 	"github.com/labstack/echo/v4"
+	"github.com/ymhiroki/pprotein-v2026/internal/storage"
 )
 
 type (

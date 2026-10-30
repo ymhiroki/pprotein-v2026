@@ -1,4 +1,4 @@
-module github.com/kaz/pprotein
+module github.com/ymhiroki/pprotein-v2026
 
 go 1.23.3
 

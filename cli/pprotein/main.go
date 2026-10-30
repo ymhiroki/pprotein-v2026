@@ -4,17 +4,17 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/kaz/pprotein/integration/echov4"
-	"github.com/kaz/pprotein/internal/collect"
-	"github.com/kaz/pprotein/internal/collect/group"
-	"github.com/kaz/pprotein/internal/event"
-	"github.com/kaz/pprotein/internal/extproc/alp"
-	"github.com/kaz/pprotein/internal/extproc/slp"
-	"github.com/kaz/pprotein/internal/memo"
-	"github.com/kaz/pprotein/internal/pprof"
-	"github.com/kaz/pprotein/internal/storage"
-	"github.com/kaz/pprotein/view"
 	"github.com/labstack/echo/v4"
+	"github.com/ymhiroki/pprotein-v2026/integration/echov4"
+	"github.com/ymhiroki/pprotein-v2026/internal/collect"
+	"github.com/ymhiroki/pprotein-v2026/internal/collect/group"
+	"github.com/ymhiroki/pprotein-v2026/internal/event"
+	"github.com/ymhiroki/pprotein-v2026/internal/extproc/alp"
+	"github.com/ymhiroki/pprotein-v2026/internal/extproc/slp"
+	"github.com/ymhiroki/pprotein-v2026/internal/memo"
+	"github.com/ymhiroki/pprotein-v2026/internal/pprof"
+	"github.com/ymhiroki/pprotein-v2026/internal/storage"
+	"github.com/ymhiroki/pprotein-v2026/view"
 )
 
 func start() error {
