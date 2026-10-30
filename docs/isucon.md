@@ -8,36 +8,20 @@ pprotein-v2026 を ISUCON で使うための手順です。例年に多い、次
 
 ホスト名、ユーザー名、ポート、サービス名は、当日の環境に合わせて読み替えてください。手順 1〜5、ベンチ、ログの truncate、pprotein-agent の流れは、Ubuntu 24.04（nginx 1.24、MySQL 8.0）のコンテナで、amd64 と arm64 の両方について確認しています。コンテナには systemd も SSH も無いので、`systemctl`、`scp`、`ssh` を使う部分は試していません。
 
-## 前日までに: Linux 用のバイナリを作る
-
-Go と Node.js が入った手元のマシンで作っておくと、当日はコピーするだけで済みます。
-
-```sh
-git clone https://github.com/ymhiroki/pprotein-v2026.git
-cd pprotein-v2026
-make view/dist
-for arch in amd64 arm64; do
-  GOOS=linux GOARCH=$arch CGO_ENABLED=0 go build -o ~/isucon-bin/linux-$arch/ ./cli/pprotein ./cli/pprotein-agent
-done
-```
-
 ## 当日の準備
 
 ### 1. pprotein を起動する
 
-isu1 で `uname -m` を実行し、`x86_64` なら amd64、`aarch64` なら arm64 のバイナリと URL を使います。
+isu1 で `uname -m` を実行し、`x86_64` なら amd64、`aarch64` なら arm64 の URL を使います。
 
 ```sh
-# 手元から
-scp ~/isucon-bin/linux-amd64/* isucon@isu1:/tmp/
-
-# isu1 で
-sudo install /tmp/pprotein /tmp/pprotein-agent /usr/local/bin/
+curl -sSL https://github.com/ymhiroki/pprotein-v2026/releases/download/v1.3.0/pprotein-v2026_1.3.0_linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin pprotein pprotein-agent
 curl -sSL https://github.com/tkuchiki/alp/releases/download/v1.0.22/alp_linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin alp
 curl -sSL https://github.com/tkuchiki/slp/releases/download/v0.2.3/slp_linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin slp
 mkdir -p ~/pprotein && cd ~/pprotein && nohup pprotein >> pprotein.log 2>&1 &
 ```
 
+- pprotein と pprotein-agent は、このリポジトリの [Releases](https://github.com/ymhiroki/pprotein-v2026/releases) から取ります。
 - slp は C のライブラリに依存しているので、手元からクロスビルドできません。配布されているバイナリを使います。動かすには glibc 2.34 以上（Ubuntu 22.04 以降）が必要です。
 - データは `~/pprotein/data/` に保存されます。
 - UI は、手元で `ssh -N -L 9000:localhost:9000 isucon@isu1` を実行してから http://localhost:9000 で開きます。認証が無いので、9000 番ポートは外部に開けないでください。
@@ -136,7 +120,7 @@ sudo truncate -s 0 /var/log/nginx/access.log /var/log/mysql/mysql-slow.log
 
 ### 構成を変えたとき
 
-- **DB を isu3 に移したとき:** 手順 1 と同じように isu3 にも pprotein-agent を入れて、`nohup sudo pprotein-agent >> agent.log 2>&1 &` で起動します。root で動くので、グループの設定は要りません。slowlog の URL は `http://<isu3 の IP>:19000/debug/log/slowlog` に変えます。
+- **DB を isu3 に移したとき:** isu3 でも手順 1 の 1 行目を実行して pprotein-agent を入れ、`nohup sudo pprotein-agent >> agent.log 2>&1 &` で起動します。root で動くので、グループの設定は要りません。slowlog の URL は `http://<isu3 の IP>:19000/debug/log/slowlog` に変えます。
 - **アプリを複数台にしたとき:** pprof の行を台数分に増やします。isu1 以外のサーバーで `/initialize` を受けるときは、手順 2 の URL の `localhost` を isu1 の IP に変えてください。
 
 ## 最後のベンチの前に
@@ -157,3 +141,15 @@ UI の Status 欄の「Failed …」をクリックすると、エラーの内�
 - **`received empty content`:** `Duration` の間にログが 1 行も増えていません。ログのパス、nginx の再読み込み、MySQL の再起動を確認してください。
 - **Commit 列にメッセージが出ない:** アプリの作業ディレクトリかその親が git リポジトリで、`origin` が設定されている必要があります。リポジトリが別の場所にあるなら、アプリの環境変数 `PPROTEIN_GIT_REPOSITORY` で指定します。
 - **pprof の Graph が開けない:** graphviz が必要です（`sudo apt install graphviz`）。フレームグラフは graphviz なしで見られます。
+- **サーバーから GitHub に繋がらない:** Go と Node.js が入った手元のマシンで Linux 用のバイナリを作り、`scp` でコピーします。alp と slp も、手元で手順 1 の URL からダウンロードして同じようにコピーしてください。
+
+  ```sh
+  # 手元で
+  git clone https://github.com/ymhiroki/pprotein-v2026.git && cd pprotein-v2026
+  make view/dist
+  GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ~/isucon-bin/linux-amd64/ ./cli/pprotein ./cli/pprotein-agent
+  scp ~/isucon-bin/linux-amd64/* isucon@isu1:/tmp/
+
+  # isu1 で
+  sudo install /tmp/pprotein /tmp/pprotein-agent /usr/local/bin/
+  ```

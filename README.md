@@ -19,7 +19,9 @@ ISUCON 当日の手順は [docs/isucon.md](docs/isucon.md) にまとめていま
 
 ## pprotein サーバー
 
-ビルドには Go 1.23.3 以上と Node.js（npm）が必要です。
+Linux と macOS（amd64 / arm64）向けのビルド済みバイナリを [Releases](https://github.com/ymhiroki/pprotein-v2026/releases) に置いています。pprotein と pprotein-agent が入っています。
+
+自分でビルドする場合は、Go 1.23.3 以上と Node.js（npm）が必要です。
 
 ```sh
 make build
