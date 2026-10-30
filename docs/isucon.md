@@ -15,7 +15,7 @@ pprotein-v2026 を ISUCON で使うための手順です。例年に多い、次
 isu1 で `uname -m` を実行し、`x86_64` なら amd64、`aarch64` なら arm64 の URL を使います。
 
 ```sh
-curl -sSL https://github.com/ymhiroki/pprotein-v2026/releases/download/v1.3.0/pprotein-v2026_1.3.0_linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin pprotein pprotein-agent
+curl -sSL https://github.com/ymhiroki/pprotein-v2026/releases/download/v1.4.0/pprotein-v2026_1.4.0_linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin pprotein pprotein-agent
 curl -sSL https://github.com/tkuchiki/alp/releases/download/v1.0.22/alp_linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin alp
 curl -sSL https://github.com/tkuchiki/slp/releases/download/v0.2.3/slp_linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin slp
 mkdir -p ~/pprotein && cd ~/pprotein && nohup pprotein >> pprotein.log 2>&1 &
@@ -122,6 +122,31 @@ sudo truncate -s 0 /var/log/nginx/access.log /var/log/mysql/mysql-slow.log
 
 - **DB を isu3 に移したとき:** isu3 でも手順 1 の 1 行目を実行して pprotein-agent を入れ、`nohup sudo pprotein-agent >> agent.log 2>&1 &` で起動します。root で動くので、グループの設定は要りません。slowlog の URL は `http://<isu3 の IP>:19000/debug/log/slowlog` に変えます。
 - **アプリを複数台にしたとき:** pprof の行を台数分に増やします。isu1 以外のサーバーで `/initialize` を受けるときは、手順 2 の URL の `localhost` を isu1 の IP に変えてください。
+
+## AI に分析させる
+
+`GET /api/report/latest` は、最新のベンチ 1 回分の結果を 1 つの Markdown にまとめて返します。中身は次のとおりです。
+
+- 収集先ごとの状態とコミット、メモ
+- alp と slp の結果: Sum と Sum(QueryTime) の大きい順に上位 20 件。クエリは全文が入ります
+- プロファイルごとの上位 20 関数: flat 順と cum 順の 2 つの表
+
+```sh
+# 手元の PC で SSH トンネルを張っているとき
+curl -s localhost:9000/api/report/latest
+
+# トンネルが無いとき
+ssh isucon@<isu1 のグローバル IP> 'curl -s localhost:9000/api/report/latest'
+```
+
+- 件数は `?n=50` のように変えられます（最大 1000）。
+- ほかのグループは `/api/report/<グループ ID>` で取れます。レポートの先頭に 1 つ前のグループ ID が書いてあるので、2 回分を読ませれば比較もできます。
+
+コマンドを実行できる AI には、たとえば次のように頼みます。ブラウザで使う AI には、curl の出力を貼り付けて渡してください。
+
+> `curl -s localhost:9000/api/report/latest` の結果を読んで、スコアを上げるために次に直すところを、根拠になる数字と一緒に 3 つ挙げて
+
+大会のルールで、AI の利用や、ログやコードを外部のサービスに送ることが認められているかを事前に確認してください。レポートには、エンドポイントの URL、SQL、関数名が入ります。SQL の値は、slp が `N` や `'S'` に置き換えます。
 
 ## 最後のベンチの前に
 

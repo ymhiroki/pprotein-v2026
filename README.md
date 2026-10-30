@@ -16,6 +16,7 @@ ISUCON 当日の手順は [docs/isucon.md](docs/isucon.md) にまとめていま
 - alp / slp が失敗したとき、ツールのエラー出力も UI に表示
 - clone した直後でも `make run` で起動できるように修正
 - pprof / alp / slp / memo で重複していたハンドラを共通化
+- ベンチ 1 回分の結果を 1 つの Markdown で返す `GET /api/report/latest` を追加（AI に読ませる用）
 
 ## pprotein サーバー
 
@@ -84,6 +85,8 @@ UI の setting ページで、`group/targets` に収集先を書きます。ホ�
 - `httplog/config`（alp の設定）の `matching_groups` は、デモ用の値になっています。アプリの URL に合わせて書き換えてください。
 
 group ページの Collect ボタンか `GET /api/group/collect` で、すべての収集先から同時に取得します。`Duration` をベンチマークの長さに合わせ、ベンチマークの開始時にこの URL を叩くと、ベンチマーク中のデータだけを取れます。
+
+取得した結果は、`GET /api/report/latest` で 1 つの Markdown として取れます。alp と slp の上位、プロファイルの上位関数、コミット、メモが入っているので、そのまま AI に読ませられます。詳しくは [docs/isucon.md](docs/isucon.md) を見てください。
 
 pprotein サーバーにも `/debug/*` にも認証はありません。ポートは信頼できるネットワークにだけ公開してください。
 
