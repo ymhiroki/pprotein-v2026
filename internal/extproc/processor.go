@@ -1,4 +1,4 @@
-package alp
+package extproc
 
 import (
 	"bytes"
@@ -12,6 +12,7 @@ import (
 type (
 	processor struct {
 		confPath string
+		args     func(configPath, bodyPath string) []string
 	}
 )
 
@@ -25,7 +26,8 @@ func (p *processor) Process(snapshot *collect.Snapshot) (io.ReadCloser, error) {
 		return nil, fmt.Errorf("failed to find snapshot body: %w", err)
 	}
 
-	cmd := exec.Command("alp", "ltsv", "--config", p.confPath, "--format", "tsv", "--file", bodyPath)
+	args := p.args(p.confPath, bodyPath)
+	cmd := exec.Command(args[0], args[1:]...)
 
 	res, err := cmd.Output()
 	if err != nil {
