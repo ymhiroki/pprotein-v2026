@@ -2,7 +2,7 @@
 noop:
 
 .PHONY: run
-run:
+run: view/dist
 	go run ./cli/pprotein
 
 .PHONY: run-agent
