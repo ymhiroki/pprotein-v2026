@@ -3,7 +3,7 @@ package storage
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 
 	"go.etcd.io/bbolt"
 )
@@ -19,7 +19,7 @@ func newKV(workdir string) (kvStorage, error) {
 		return nil, fmt.Errorf("failed to create workdir: %w", err)
 	}
 
-	db, err := bbolt.Open(path.Join(workdir, "pprotein.db"), 0600, nil)
+	db, err := bbolt.Open(filepath.Join(workdir, "pprotein.db"), 0600, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize DB: %w", err)
 	}

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 
 	"github.com/ymhiroki/pprotein-v2026/internal/collect"
 )
@@ -23,7 +23,7 @@ func (p *processor) Process(snapshot *collect.Snapshot) (io.ReadCloser, error) {
 		return nil, fmt.Errorf("failed to find snapshot body: %w", err)
 	}
 
-	res, err := ioutil.ReadFile(bodyPath)
+	res, err := os.ReadFile(bodyPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read snapshot body: %w", err)
 	}

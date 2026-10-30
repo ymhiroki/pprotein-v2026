@@ -47,23 +47,21 @@ func start() error {
 	hub := event.NewHub()
 	hub.RegisterHandlers(api.Group("/event"))
 
-	pprofOpts := &collect.Options{
-		Type:     "pprof",
-		Ext:      "-pprof.pb.gz",
-		Store:    store,
-		EventHub: hub,
+	// typ is the storage bucket and the Type shown in the UI; ext is the suffix of snapshot IDs.
+	options := func(typ, ext string) *collect.Options {
+		return &collect.Options{
+			Type:     typ,
+			Ext:      ext,
+			Store:    store,
+			EventHub: hub,
+		}
 	}
-	if err := pprof.NewHandler(pprofOpts).Register(api.Group("/pprof")); err != nil {
+
+	if err := pprof.NewHandler(options("pprof", "-pprof.pb.gz")).Register(api.Group("/pprof")); err != nil {
 		return err
 	}
 
-	alpOpts := &collect.Options{
-		Type:     "httplog",
-		Ext:      "-httplog.log",
-		Store:    store,
-		EventHub: hub,
-	}
-	alpHandler, err := alp.NewHandler(alpOpts, store)
+	alpHandler, err := alp.NewHandler(options("httplog", "-httplog.log"), store)
 	if err != nil {
 		return err
 	}
@@ -71,13 +69,7 @@ func start() error {
 		return err
 	}
 
-	slpOpts := &collect.Options{
-		Type:     "slowlog",
-		Ext:      "-slowlog.log",
-		Store:    store,
-		EventHub: hub,
-	}
-	slpHandler, err := slp.NewHandler(slpOpts, store)
+	slpHandler, err := slp.NewHandler(options("slowlog", "-slowlog.log"), store)
 	if err != nil {
 		return err
 	}
@@ -85,13 +77,7 @@ func start() error {
 		return err
 	}
 
-	memoOpts := &collect.Options{
-		Type:     "memo",
-		Ext:      "-memo.log",
-		Store:    store,
-		EventHub: hub,
-	}
-	if err := memo.NewHandler(memoOpts).Register(api.Group("/memo")); err != nil {
+	if err := memo.NewHandler(options("memo", "-memo.log")).Register(api.Group("/memo")); err != nil {
 		return err
 	}
 

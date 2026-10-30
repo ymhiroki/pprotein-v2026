@@ -3,7 +3,7 @@ package storage
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type (
@@ -21,7 +21,7 @@ func newFile(workdir string) (fileStorage, error) {
 }
 
 func (s *fileStore) PutFile(id string, data []byte) error {
-	file, err := os.Create(path.Join(s.workdir, id))
+	file, err := os.Create(filepath.Join(s.workdir, id))
 	if err != nil {
 		return fmt.Errorf("failed to create file: %w", err)
 	}
@@ -33,9 +33,9 @@ func (s *fileStore) PutFile(id string, data []byte) error {
 	return nil
 }
 func (s *fileStore) GetFilePath(id string) (string, error) {
-	return path.Join(s.workdir, id), nil
+	return filepath.Join(s.workdir, id), nil
 }
 func (s *fileStore) ExistsFile(id string) (bool, error) {
-	_, err := os.Stat(path.Join(s.workdir, id))
+	_, err := os.Stat(filepath.Join(s.workdir, id))
 	return err == nil, nil
 }

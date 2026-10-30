@@ -97,13 +97,9 @@ func (cl *Collector) collectAll(c echo.Context) error {
 	grpId := time.Now().Format("2006-01-02_15-04-05.999999")
 	eg := &errgroup.Group{}
 
-	ch := make(chan error, len(targets))
-	defer close(ch)
-
 	for _, target := range targets {
-		target := *target
 		eg.Go(func() error {
-			return cl.makeInternalRequest(grpId, target)
+			return cl.makeInternalRequest(grpId, *target)
 		})
 	}
 

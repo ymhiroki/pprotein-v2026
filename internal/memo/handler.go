@@ -2,7 +2,7 @@ package memo
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/goccy/go-json"
@@ -47,29 +47,44 @@ func (h *handler) Register(g *echo.Group) error {
 }
 
 func (h *handler) getIndex(c echo.Context) error {
-	list := h.collector.List()
-	for _, m := range list {
-		r, err := h.collector.Get(m.Snapshot.ID)
+	entries := h.collector.List()
+	resp := make([]*collect.Entry, 0, len(entries))
+	for _, ent := range entries {
+		text, err := h.readText(ent.Snapshot.ID)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("failed to get entry: %w", err))
-		}
-		buf, err := ioutil.ReadAll(r)
-		r.Close()
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("failed to read entry: %v", err))
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
 		}
 
-		var v textValue
-		json.Unmarshal(buf, &v)
-
-		m.Message = v.Text
+		// Respond with a copy so the entry shared with the collector is not modified.
+		memo := *ent
+		memo.Message = text
+		resp = append(resp, &memo)
 	}
-	return c.JSON(http.StatusOK, h.collector.List())
+	return c.JSON(http.StatusOK, resp)
+}
+
+// readText returns the memo text stored in the snapshot body.
+func (h *handler) readText(id string) (string, error) {
+	r, err := h.collector.Get(id)
+	if err != nil {
+		return "", fmt.Errorf("failed to get entry: %w", err)
+	}
+	defer r.Close()
+
+	buf, err := io.ReadAll(r)
+	if err != nil {
+		return "", fmt.Errorf("failed to read entry: %w", err)
+	}
+
+	// A broken body shows up as an empty memo instead of failing the whole list.
+	var v textValue
+	_ = json.Unmarshal(buf, &v)
+	return v.Text, nil
 }
 
 func (h *handler) postIndex(c echo.Context) error {
 	req := &requestBody{}
-	if err := c.Bind(&req); err != nil {
+	if err := c.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("failed to parse request body: %v", err))
 	}
 
