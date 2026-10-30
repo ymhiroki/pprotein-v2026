@@ -60,6 +60,20 @@ func (s *Snapshot) marshal() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+// clone returns a copy of the snapshot whose metadata and target are not shared with s.
+func (s *Snapshot) clone() *Snapshot {
+	c := &Snapshot{store: s.store}
+	if s.SnapshotMeta != nil {
+		meta := *s.SnapshotMeta
+		c.SnapshotMeta = &meta
+	}
+	if s.SnapshotTarget != nil {
+		target := *s.SnapshotTarget
+		c.SnapshotTarget = &target
+	}
+	return c
+}
+
 func (s *Snapshot) Collect() error {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s?seconds=%d", s.URL, s.Duration), nil)
 	if err != nil {

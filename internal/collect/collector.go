@@ -78,7 +78,9 @@ func New(processor Processor, opts *Options) (*Collector, error) {
 
 func (c *Collector) updateStatus(snapshot *Snapshot, status Status, msg string) {
 	entry := &Entry{
-		Snapshot: snapshot,
+		// Publish a copy: entries are read without the lock (e.g. JSON-encoded by List callers)
+		// while the collecting goroutine keeps filling in the original snapshot.
+		Snapshot: snapshot.clone(),
 		Status:   status,
 		Message:  msg,
 	}
