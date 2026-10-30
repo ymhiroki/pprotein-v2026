@@ -118,12 +118,10 @@ func (c *Collector) runProcessor(snapshot *Snapshot) error {
 }
 
 func (c *Collector) Get(id string) (io.ReadCloser, error) {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	ent, ok := c.data[id]
+	// Process outside the lock: it may run an external command, and updateStatus needs the write lock.
+	ent, ok := c.lookup(id)
 	if !ok {
-		return nil, fmt.Errorf("no such entry: %v", ent)
+		return nil, fmt.Errorf("no such entry: %s", id)
 	}
 
 	return c.processor.Process(ent.Snapshot)
