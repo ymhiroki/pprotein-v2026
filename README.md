@@ -4,6 +4,8 @@
 
 元のコードの作者は Kazuki Sawada さん（[@kaz](https://github.com/kaz)）です。ライセンスは upstream と同じ MIT です（[LICENSE](LICENSE)）。
 
+ISUCON 当日の手順は [docs/isucon.md](docs/isucon.md) にまとめています。
+
 ## upstream との違い
 
 [kaz/pprotein@fd0b0b1](https://github.com/kaz/pprotein/tree/fd0b0b1da93994dc4abb986222b92606c4fe9b2b)（2024-11-07）を元にしています。エンドポイントは upstream と同じなので、upstream の `integration` を組み込んだアプリからもそのまま収集できます。
