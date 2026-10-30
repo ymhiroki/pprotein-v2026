@@ -42,7 +42,7 @@ func (h *handler) Register(g *echo.Group) error {
 
 	g.GET("", h.getIndex)
 	g.POST("", h.postIndex)
-	g.GET("/:id", h.getId)
+	g.GET("/:id", h.collector.HandleProcessed)
 	return nil
 }
 
@@ -101,14 +101,4 @@ func (h *handler) postIndex(c echo.Context) error {
 	h.opts.EventHub.Publish(eventData)
 
 	return c.NoContent(http.StatusAccepted)
-}
-
-func (h *handler) getId(c echo.Context) error {
-	r, err := h.collector.Get(c.Param("id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("failed to get entry: %w", err))
-	}
-	defer r.Close()
-
-	return c.Stream(http.StatusOK, "application/json", r)
 }

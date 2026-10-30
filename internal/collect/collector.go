@@ -127,6 +127,14 @@ func (c *Collector) Get(id string) (io.ReadCloser, error) {
 	return c.processor.Process(ent.Snapshot)
 }
 
+func (c *Collector) lookup(id string) (*Entry, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	ent, ok := c.data[id]
+	return ent, ok
+}
+
 func (c *Collector) List() []*Entry {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
