@@ -1,12 +1,17 @@
 package event
 
 import (
+	"sync"
+
 	"github.com/alexandrevicenzi/go-sse"
 	"github.com/labstack/echo/v4"
 )
 
 type (
 	Hub struct {
+		// mu serializes Publish: go-sse's Channel.SendMessage writes lastEventID
+		// without locking, and every collector publishes from its own goroutine.
+		mu     sync.Mutex
 		server *sse.Server
 	}
 )
@@ -21,5 +26,8 @@ func (h *Hub) RegisterHandlers(g *echo.Group) {
 	g.GET("", echo.WrapHandler(h.server))
 }
 func (h *Hub) Publish(message []byte) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	h.server.SendMessage("", sse.SimpleMessage(string(message)))
 }
