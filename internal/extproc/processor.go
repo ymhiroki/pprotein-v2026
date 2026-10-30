@@ -2,6 +2,7 @@ package extproc
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os/exec"
@@ -31,6 +32,11 @@ func (p *processor) Process(snapshot *collect.Snapshot) (io.ReadCloser, error) {
 
 	res, err := cmd.Output()
 	if err != nil {
+		// Show the tool's own message (e.g. a bad regexp in alp.yml) in the UI, not only the exit status.
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) && len(exitErr.Stderr) > 0 {
+			return nil, fmt.Errorf("external process aborted: %w: %s", err, bytes.TrimSpace(exitErr.Stderr))
+		}
 		return nil, fmt.Errorf("external process aborted: %w", err)
 	}
 
