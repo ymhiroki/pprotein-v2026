@@ -23,9 +23,10 @@ type (
 	}
 
 	Handler struct {
-		opts    *collect.Options
-		command Command
-		config  *persistent.Handler
+		opts      *collect.Options
+		command   Command
+		config    *persistent.Handler
+		collector *collect.Collector
 	}
 )
 
@@ -52,10 +53,16 @@ func (h *Handler) Register(g *echo.Group) error {
 	if err != nil {
 		return fmt.Errorf("failed to initialize collector: %w", err)
 	}
+	h.collector = collector
 
 	collector.RegisterHandlers(g)
 	g.GET("/:id", collector.HandleProcessed)
 	return nil
+}
+
+// Collector returns the collector created by Register.
+func (h *Handler) Collector() *collect.Collector {
+	return h.collector
 }
 
 func sanitizeYAML(raw []byte) ([]byte, error) {

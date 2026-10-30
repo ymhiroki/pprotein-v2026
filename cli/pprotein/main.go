@@ -13,6 +13,7 @@ import (
 	"github.com/ymhiroki/pprotein-v2026/internal/extproc/slp"
 	"github.com/ymhiroki/pprotein-v2026/internal/memo"
 	"github.com/ymhiroki/pprotein-v2026/internal/pprof"
+	"github.com/ymhiroki/pprotein-v2026/internal/report"
 	"github.com/ymhiroki/pprotein-v2026/internal/storage"
 	"github.com/ymhiroki/pprotein-v2026/view"
 )
@@ -57,7 +58,8 @@ func start() error {
 		}
 	}
 
-	if err := pprof.NewHandler(options("pprof", "-pprof.pb.gz")).Register(api.Group("/pprof")); err != nil {
+	pprofHandler := pprof.NewHandler(options("pprof", "-pprof.pb.gz"))
+	if err := pprofHandler.Register(api.Group("/pprof")); err != nil {
 		return err
 	}
 
@@ -77,9 +79,17 @@ func start() error {
 		return err
 	}
 
-	if err := memo.NewHandler(options("memo", "-memo.log")).Register(api.Group("/memo")); err != nil {
+	memoHandler := memo.NewHandler(options("memo", "-memo.log"))
+	if err := memoHandler.Register(api.Group("/memo")); err != nil {
 		return err
 	}
+
+	report.NewHandler(report.Sources{
+		HTTPLog: alpHandler.Collector(),
+		SlowLog: slpHandler.Collector(),
+		PProf:   pprofHandler.Collector(),
+		Memos:   memoHandler.Entries,
+	}).Register(api.Group("/report"))
 
 	grp, err := group.NewCollector(store, port)
 	if err != nil {

@@ -47,20 +47,29 @@ func (h *handler) Register(g *echo.Group) error {
 }
 
 func (h *handler) getIndex(c echo.Context) error {
+	resp, err := h.Entries()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, resp)
+}
+
+// Entries returns the memos with Message set to the memo text.
+func (h *handler) Entries() ([]*collect.Entry, error) {
 	entries := h.collector.List()
 	resp := make([]*collect.Entry, 0, len(entries))
 	for _, ent := range entries {
 		text, err := h.readText(ent.Snapshot.ID)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
+			return nil, err
 		}
 
-		// Respond with a copy so the entry shared with the collector is not modified.
+		// Return a copy so the entry shared with the collector is not modified.
 		memo := *ent
 		memo.Message = text
 		resp = append(resp, &memo)
 	}
-	return c.JSON(http.StatusOK, resp)
+	return resp, nil
 }
 
 // readText returns the memo text stored in the snapshot body.

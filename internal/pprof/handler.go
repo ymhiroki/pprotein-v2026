@@ -9,7 +9,8 @@ import (
 
 type (
 	handler struct {
-		opts *collect.Options
+		opts      *collect.Options
+		collector *collect.Collector
 	}
 )
 
@@ -26,8 +27,14 @@ func (h *handler) Register(g *echo.Group) error {
 	if err != nil {
 		return fmt.Errorf("failed to initialize collector: %w", err)
 	}
+	h.collector = collector
 
 	collector.RegisterHandlers(g)
 	g.Any("/:id/*", p.serveUI)
 	return nil
+}
+
+// Collector returns the collector created by Register.
+func (h *handler) Collector() *collect.Collector {
+	return h.collector
 }
