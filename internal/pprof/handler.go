@@ -2,7 +2,6 @@ package pprof
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ymhiroki/pprotein-v2026/internal/collect"
@@ -18,8 +17,10 @@ func NewHandler(opts *collect.Options) *handler {
 	return &handler{opts: opts}
 }
 
+// Register registers the shared collector endpoints and the pprof web UI of each
+// snapshot at /:id/ (for example /:id/flamegraph).
 func (h *handler) Register(g *echo.Group) error {
-	p := &processor{mu: &sync.Mutex{}, route: g}
+	p := newProcessor()
 
 	collector, err := collect.New(p, h.opts)
 	if err != nil {
@@ -27,5 +28,6 @@ func (h *handler) Register(g *echo.Group) error {
 	}
 
 	collector.RegisterHandlers(g)
+	g.Any("/:id/*", p.serveUI)
 	return nil
 }
